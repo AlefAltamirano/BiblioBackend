@@ -1,0 +1,64 @@
+### ==========================================
+### COLECCIÓN DE PETICIONES BIBLIOBACKEND (RETO 02)
+### ==========================================
+
+### 1. Health Check
+GET http://localhost:8080/api/health
+
+### 2. Listar Géneros
+GET http://localhost:8080/api/v1/generos
+
+### 3. Listar Libros
+GET http://localhost:8080/api/v1/libros
+
+### 4. Listar Socios
+GET http://localhost:8080/api/v1/socios
+
+### 5. Registrar un Préstamo (Exitoso)
+POST http://localhost:8080/api/v1/prestamos
+Content-Type: application/json
+
+{
+  "socioId": 1,
+  "detalles": [
+    { "libroId": 5, "cantidad": 1 },
+    { "libroId": 18, "cantidad": 2 }
+  ]
+}
+
+### 6. Registrar Préstamo Error: Socio Inactivo (RN-02 -> HTTP 409)
+POST http://localhost:8080/api/v1/prestamos
+Content-Type: application/json
+
+{
+  "socioId": 10,
+  "detalles": [
+    { "libroId": 1, "cantidad": 1 }
+  ]
+}
+
+### 7. Registrar Préstamo Error: Stock Insuficiente (RN-05 -> HTTP 409)
+POST http://localhost:8080/api/v1/prestamos
+Content-Type: application/json
+
+{
+  "socioId": 2,
+  "detalles": [
+    { "libroId": 2, "cantidad": 999 }
+  ]
+}
+
+### 8. Búsqueda de Préstamos con Filtros Combinados (RF-07)
+GET http://localhost:8080/api/v1/prestamos/buscar?socioId=1&estado=REGISTRADO&orden=desc
+
+### 9. Registrar Devolución de Préstamo (RF-05)
+PATCH http://localhost:8080/api/v1/prestamos/2/devolucion
+
+### 10. Anular Préstamo (RF-06)
+PATCH http://localhost:8080/api/v1/prestamos/4/anular
+
+### 11. Reporte 1: Préstamos por Género (RF-08)
+GET http://localhost:8080/api/v1/reportes/prestamos-por-genero
+
+### 12. Reporte 2: Libros más Prestados (RF-08)
+GET http://localhost:8080/api/v1/reportes/libros-mas-prestados
