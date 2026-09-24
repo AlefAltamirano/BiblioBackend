@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -154,9 +155,57 @@ public class PrestamoServiceImpl implements PrestamoService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<PrestamoResponseDTO> buscarConFiltros(Long socioId, EstadoPrestamo estado, LocalDateTime desde, LocalDateTime hasta, String orden) {
-        Sort sort = "asc".equalsIgnoreCase(orden) ? Sort.by("fecha").ascending() : Sort.by("fecha").descending();
-        return prestamoRepository.buscarFiltrosCombinados(socioId, estado, desde, hasta, sort)
+    public List<PrestamoResponseDTO> buscarConFiltros(
+            Long socioId,
+            EstadoPrestamo estado,
+            LocalDate desde,
+            LocalDate hasta,
+            String ordenarPor,
+            String direccion
+    ) {
+
+        if (desde != null && hasta != null && desde.isAfter(hasta)) {
+            throw new ReglaNegocioException(
+                    "La fecha desde no puede ser posterior a la fecha hasta."
+            );
+        }
+
+        if (!CAMPOS_ORDEN_PERMITIDOS.contains(ordenarPor)) {
+            throw new ReglaNegocioException(
+                    "Campo de ordenamiento no permitido: " + ordenarPor
+            );
+        }
+
+        if (!"asc".equalsIgnoreCase(direccion)
+                && !"desc".equalsIgnoreCase(direccion)) {
+
+            throw new ReglaNegocioException(
+                    "La direccion debe ser 'asc' o 'desc'."
+            );
+        }
+
+        LocalDateTime fechaDesde = desde != null
+                ? desde.atStartOfDay()
+                : null;
+
+        LocalDateTime fechaHasta = hasta != null
+                ? hasta.plusDays(1).atStartOfDay().minusNanos(1)
+                : null;
+
+        Sort.Direction sortDirection =
+                "asc".equalsIgnoreCase(direccion)
+                        ? Sort.Direction.ASC
+                        : Sort.Direction.DESC;
+
+        Sort sort = Sort.by(sortDirection, ordenarPor);
+
+        return prestamoRepository.buscarFiltrosCombinados(
+                        socioId,
+                        estado,
+                        fechaDesde,
+                        fechaHasta,
+                        sort
+                )
                 .stream()
                 .map(this::mapToResponseDTO)
                 .toList();
@@ -186,4 +235,11 @@ public class PrestamoServiceImpl implements PrestamoService {
                 .detalles(detallesDTO)
                 .build();
     }
+    private static final Set<String> CAMPOS_ORDEN_PERMITIDOS =
+            Set.of(
+                    "id",
+                    "fecha",
+                    "totalValorizado",
+                    "estado"
+            );
 }

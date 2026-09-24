@@ -18,15 +18,15 @@ public interface PrestamoRepository extends JpaRepository<Prestamo, Long> {
 
     // 1. Busqueda con filtros combinados opcionales y optimizacion JOIN FETCH
     @Query("""
-        SELECT DISTINCT p FROM Prestamo p
-        LEFT JOIN FETCH p.socio s
-        LEFT JOIN FETCH p.detalles d
-        LEFT JOIN FETCH d.libro l
-        WHERE (:socioId IS NULL OR p.socio.id = :socioId)
-        AND (:estado IS NULL OR p.estado = :estado)
-        AND (:desde IS NULL OR p.fecha >= :desde)
-        AND (:hasta IS NULL OR p.fecha <= :hasta)
-        """)
+    SELECT DISTINCT p FROM Prestamo p
+    LEFT JOIN FETCH p.socio s
+    LEFT JOIN FETCH p.detalles d
+    LEFT JOIN FETCH d.libro l
+    WHERE (:socioId IS NULL OR p.socio.id = :socioId)
+      AND (:estado IS NULL OR p.estado = :estado)
+      AND (:desde IS NULL OR p.fecha >= :desde)
+      AND (:hasta IS NULL OR p.fecha <= :hasta)
+    """)
     List<Prestamo> buscarFiltrosCombinados(
             @Param("socioId") Long socioId,
             @Param("estado") EstadoPrestamo estado,

@@ -11,6 +11,7 @@ import pe.edu.upeu.BiblioBackend.dto.PrestamoResponseDTO;
 import pe.edu.upeu.BiblioBackend.enums.EstadoPrestamo;
 import pe.edu.upeu.BiblioBackend.service.service.PrestamoService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,10 +46,29 @@ public class PrestamoController {
     public ResponseEntity<List<PrestamoResponseDTO>> buscarConFiltros(
             @RequestParam(required = false) Long socioId,
             @RequestParam(required = false) EstadoPrestamo estado,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta,
-            @RequestParam(required = false, defaultValue = "desc") String orden
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate desde,
+
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate hasta,
+
+            @RequestParam(required = false, defaultValue = "fecha")
+            String ordenarPor,
+
+            @RequestParam(required = false, defaultValue = "desc")
+            String direccion
     ) {
-        return ResponseEntity.ok(prestamoService.buscarConFiltros(socioId, estado, desde, hasta, orden));
+        return ResponseEntity.ok(
+                prestamoService.buscarConFiltros(
+                        socioId,
+                        estado,
+                        desde,
+                        hasta,
+                        ordenarPor,
+                        direccion
+                )
+        );
     }
 }
